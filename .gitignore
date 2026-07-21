@@ -219,6 +219,6 @@ __marimo__/
 
 
 # project
-data/
+/data/
 *.parquet
 .env
