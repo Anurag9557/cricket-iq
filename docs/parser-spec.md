@@ -26,3 +26,10 @@
 - always present: registry, venue, toss     → safe features
 - sometimes missing: city (306), player_of_match (880) → don't depend on
 - actual_delivery: present on 100% of deliveries → cross-check only (we compute ourselves)
+
+## Known data quirks (found in testing)
+- 18 of 14,274 innings record >120 legal balls (up to 122): an over with a 7th
+  legal ball (per Cricsheet's own actual_delivery labels, e.g. ...0.6, 0.7).
+  Cause unknown — on-field miscount or source recording quirk; NOT a parser bug
+  and NOT duplicated rows. Rare (0.13%).
+  → state builder must clamp: balls_remaining = max(0, 120 - legal_bowled)
