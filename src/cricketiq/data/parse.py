@@ -35,6 +35,8 @@ def parse_match(path: Path, league: str):
     innings = m.get("innings", [])
     if len(innings) != 2:
         return None, "not_2_innings"
+    if innings[1].get("target", {}).get("overs", 20) != 20:
+        return None, "reduced_overs"
     outcome = info.get("outcome", {})
     if "winner" not in outcome or "by" not in outcome:
         return None, "no_winner"
@@ -109,7 +111,7 @@ def parse_match(path: Path, league: str):
         "win_by": by_type,
         "win_margin": by_margin,
         "first_innings_runs": first_innings_runs,
-        "target": first_innings_runs + 1,
+        "target": innings[1].get("target", {}).get("runs", first_innings_runs + 1),
         "chase_won": int(outcome["winner"] == chase),
     }
     return match_row, delivery_rows
