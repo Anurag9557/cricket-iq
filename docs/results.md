@@ -37,3 +37,16 @@ The required-rate gap (required_rr + rr_diff ≈ 75%) dominates — a chase is m
 "ahead of or behind the rate." Momentum (runs/wkts last 30) adds a small but real
 ~3%. B1 beats B0 on every metric; the 3 resources already carry most of the signal.
 
+## Calibration (fit on val 2024, evaluated on test 2025–26)
+
+| variant | Brier | log-loss | ECE |
+|---------|------:|---------:|----:|
+| **raw B1** | **0.1144** | **0.3520** | **0.0261** |
+| isotonic | 0.1161 | 0.3575 | 0.0355 |
+| Platt | 0.1177 | 0.3714 | 0.0461 |
+
+Raw LightGBM is already well-calibrated (ECE 2.6%). BOTH explicit calibrators made
+held-out calibration WORSE — they overfit the 2024 validation season's miscalibration,
+which didn't transfer to 2025–26 (temporal distribution shift). Decision: ship raw B1,
+no post-hoc calibration. Reliability curve: docs/reliability.png.
+
