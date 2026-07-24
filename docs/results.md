@@ -24,3 +24,16 @@ features (the DLS intuition: wickets + balls + required rate).
 - B1 (LightGBM, all features) — beat B0.
 - Isotonic calibration — drive ECE → ~0; reliability diagrams.
 - Ablations (±momentum, ±phase; per-phase Brier).
+
+| **B1 LightGBM** | full 11-feature state | **0.1144** | **0.3520** | **0.9226** | 0.0261 |
+
+
+## B1 feature importance (% of gain)
+required_rr 57.5 · rr_diff 17.1 · target 7.5 · wickets_in_hand 5.6 · runs_needed 5.5
+· wkts_last30 2.0 · innings_runs 1.9 · current_rr 1.5 · runs_last30 0.9
+· balls_remaining 0.5 · over 0.1
+
+The required-rate gap (required_rr + rr_diff ≈ 75%) dominates — a chase is mostly
+"ahead of or behind the rate." Momentum (runs/wkts last 30) adds a small but real
+~3%. B1 beats B0 on every metric; the 3 resources already carry most of the signal.
+
