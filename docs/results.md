@@ -50,3 +50,26 @@ held-out calibration WORSE — they overfit the 2024 validation season's miscali
 which didn't transfer to 2025–26 (temporal distribution shift). Decision: ship raw B1,
 no post-hoc calibration. Reliability curve: docs/reliability.png.
 
+## B1 per-phase (TEST 2025–26)
+
+| phase | n | Brier | log-loss | AUC |
+|-------|--:|------:|---------:|----:|
+| powerplay (1–6) | 50,211 | 0.1572 | 0.4699 | 0.8536 |
+| middle (7–15) | 69,683 | 0.1038 | 0.3262 | 0.9353 |
+| death (16–20) | 26,091 | 0.0601 | 0.1941 | 0.9775 |
+| overall | 145,985 | 0.1144 | 0.3520 | 0.9226 |
+
+Model confidence rises through the innings (Brier 0.157→0.060, AUC 0.85→0.98).
+
+## Feature-group ablation (TEST)
+
+| features | Brier | AUC |
+|----------|------:|----:|
+| full (11) | 0.1144 | 0.9226 |
+| − momentum (9) | 0.1146 | 0.9222 |
+| resources-only, LightGBM (3) | 0.1198 | 0.9165 |
+| resources-only, B0 logistic (3) | 0.1204 | 0.9147 |
+
+~90% of the B0→B1 gain came from ADDED FEATURES (0.1198→0.1144), not the model
+(logistic→tree on the same 3 was only 0.1204→0.1198). Momentum adds ~0.0002 — nearly
+redundant. The 3 resources are already strongly (near-linearly) informative.
