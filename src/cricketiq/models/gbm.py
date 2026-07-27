@@ -11,6 +11,10 @@ from __future__ import annotations
 import lightgbm as lgb
 import polars as pl
 
+import joblib
+
+from cricketiq.core import config
+
 from cricketiq.core.config import PROCESSED_DIR
 from cricketiq.eval.metrics import evaluate
 from cricketiq.eval.split import split_by_season
@@ -58,6 +62,9 @@ def main() -> None:
     print("\n  feature importance (% of gain):")
     for f, v in sorted(zip(FEATURES, imp), key=lambda x: -x[1]):
         print(f"    {f:16s} {v:5.1f}%")
+
+    joblib.dump(model, config.PROCESSED_DIR / "b1.pkl")
+    print(f"saved model -> {config.PROCESSED_DIR / 'b1.pkl'}")
 
 
 if __name__ == "__main__":
