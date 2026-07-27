@@ -10,7 +10,7 @@ state.parquet -> data/processed/sequences.npz (load on Kaggle with np.load):
 plus feature_names, match_ids.
 """
 from __future__ import annotations
-
+"""for intentional purpose"""
 import numpy as np
 import polars as pl
 
