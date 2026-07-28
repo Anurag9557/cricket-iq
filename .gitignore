@@ -222,3 +222,4 @@ __marimo__/
 /data/
 *.parquet
 .env
+audit_runs/
