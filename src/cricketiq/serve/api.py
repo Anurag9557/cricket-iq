@@ -20,12 +20,31 @@ from __future__ import annotations
 import asyncio
 import json
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
+from pydantic import BaseModel
 
-from cricketiq.serve import data
+from cricketiq.serve import data, explain
+
+STATIC_DIR = Path(__file__).parent / "static"
+
+
+class MatchState(BaseModel):
+    """The 11 features B1 needs to score an arbitrary chase state."""
+    over: float
+    innings_runs: float
+    wickets_in_hand: float
+    balls_remaining: float
+    runs_needed: float
+    target: float
+    current_rr: float
+    required_rr: float
+    rr_diff: float
+    runs_last30: float
+    wkts_last30: float
 
 
 @asynccontextmanager
@@ -45,6 +64,12 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def index():
+    """Serve the single-page replay UI."""
+    return FileResponse(STATIC_DIR / "index.html")
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "matches": data.match_count()}
@@ -61,6 +86,21 @@ def timeline(match_id: str):
     if not balls:
         raise HTTPException(404, f"no replayable timeline for match {match_id}")
     return {"meta": data.get_meta(match_id), "balls": balls}
+
+
+@app.get("/winprob/{match_id}/{ball_seq}")
+def winprob_ball(match_id: str, ball_seq: int):
+    """Explain a real delivery: win prob + ranked TreeSHAP drivers."""
+    result = explain.explain_ball(match_id, ball_seq)
+    if result is None:
+        raise HTTPException(404, f"no state for match {match_id} ball {ball_seq}")
+    return result
+
+
+@app.post("/winprob")
+def winprob_state(state: MatchState):
+    """Score + explain an arbitrary chase state (the what-if endpoint)."""
+    return explain.explain_features(state.model_dump())
 
 
 def _sse(event: str, payload: dict) -> str:
