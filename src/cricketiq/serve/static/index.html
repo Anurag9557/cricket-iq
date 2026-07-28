@@ -84,11 +84,14 @@
   .why{margin-top:9px;display:none;flex-direction:column;gap:5px}
   .cmt.open .why{display:flex}
   .why .whead{font-size:10.5px;color:var(--ink-mut);letter-spacing:.03em;margin-bottom:2px;line-height:1.4}
-  .drow{display:grid;grid-template-columns:116px 46px 1fr;gap:8px;align-items:center;font-size:11.5px}
+  .drow{display:grid;grid-template-columns:108px 36px 46px 1fr;gap:7px;align-items:center;font-size:11.5px}
   .drow .dlabel{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .drow .dval{font-variant-numeric:tabular-nums;text-align:right;color:var(--ink-1)}
-  .dtrack{height:9px;background:var(--page);border-radius:3px;overflow:hidden}
-  .dbar{height:100%;border-radius:3px}
+  .drow .dcontrib{font-variant-numeric:tabular-nums;text-align:right;font-size:10.5px}
+  .drow .dcontrib.up{color:var(--good-text)}
+  .drow .dcontrib.dn{color:var(--critical)}
+  .dtrack{display:block;height:9px;background:var(--page);border-radius:3px;overflow:hidden}
+  .dbar{display:block;height:100%;border-radius:3px}
   .dbar.up{background:var(--good)}
   .dbar.dn{background:var(--critical)}
 </style>
@@ -309,11 +312,13 @@ async function showWhy(card, matchId, ballSeq){
     const maxC = Math.max(...w.drivers.map(d => Math.abs(d.contribution)), 1e-6);
     const rows = w.drivers.map(d => {
       const pct = Math.max(3, Math.round(Math.abs(d.contribution)/maxC*100));
+      const sc = (d.contribution>=0?"+":"") + d.contribution.toFixed(2);
       return `<div class="drow"><span class="dlabel">${d.label}</span>`+
              `<span class="dval">${d.value}</span>`+
+             `<span class="dcontrib ${d.direction==='up'?'up':'dn'}">${sc}</span>`+
              `<span class="dtrack"><span class="dbar ${d.direction==='up'?'up':'dn'}" style="width:${pct}%"></span></span></div>`;
     }).join("");
-    why.innerHTML = `<div class="whead">model drivers · <span style="color:var(--good-text)">green</span> pushes ${meta.team_chase} up, <span style="color:var(--critical)">red</span> down</div>${rows}`;
+    why.innerHTML = `<div class="whead">SHAP contribution (log-odds) · <span style="color:var(--good-text)">green</span> pushes ${meta.team_chase} up, <span style="color:var(--critical)">red</span> down</div>${rows}`;
   }catch(err){
     why.innerHTML = `<div class="whead">could not load drivers</div>`;
   }
