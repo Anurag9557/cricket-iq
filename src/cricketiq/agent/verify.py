@@ -27,6 +27,13 @@ semantically correct". Closing that gap needs the narrator to emit structured
 is small (the tool JSON hands the model the correct keys) and, importantly, measurable:
 the golden-set audit will show whether a swap ever actually happens, which is the right
 reason to defer it rather than redesign now.
+
+Nor does it verify logical INFERENCES over the values. "Kohli's death SR is higher than
+his powerplay SR" is safe — it's directly readable from the two numbers — but "more than
+40% higher" is a threshold judgment the verifier does not check: the answer "Yes" carries
+no number, so it passes provenance. This module establishes the provenance of numeric
+claims, not the soundness of conclusions drawn from them. That is the right scope for this
+project (the alternative is a theorem prover); the boundary is stated, not hidden.
 """
 from __future__ import annotations
 
