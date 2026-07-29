@@ -61,34 +61,51 @@ def _decimals(tok: str) -> int:
 
 
 def _tool_values(facts: list[dict]) -> list[float]:
-    """Every numeric value any tool returned — the set the prose is allowed to use."""
+    """Every numeric value any tool returned — the set the prose is allowed to use. Walks
+    nested lists/dicts too: some tools (get_key_moments) return a LIST of moment dicts and the
+    real numbers live inside it, not at the result's top level."""
     vals = []
+
+    def walk(x):
+        if isinstance(x, bool):
+            return                             # bool is an int subclass — never a stat
+        if isinstance(x, (int, float)):
+            vals.append(float(x))
+        elif isinstance(x, dict):
+            for v in x.values():
+                walk(v)
+        elif isinstance(x, (list, tuple)):
+            for v in x:
+                walk(v)
+
     for f in facts:
-        for v in (f.get("result") or {}).values():
-            if isinstance(v, bool):
-                continue                       # bool is an int subclass — never a stat
-            if isinstance(v, (int, float)):
-                vals.append(float(v))
+        walk(f.get("result") or {})
     return vals
 
 
 def _backed_by(p_val: float, p_tok: str, tool_vals: list[float]):
     """The tool value that backs this prose number within rounding, or None.
-    Tolerance = half a unit in the prose number's LAST shown place, so a legitimately
-    rounded value ('192' for 191.9) matches but a wrong one ('195') does not."""
+    Tolerance = half a unit in the prose number's LAST shown place, so a legitimately rounded
+    value ('192' for 191.9) matches but a wrong one ('195') does not. Matches on MAGNITUDE — a
+    signed swing stored as -36.3 is narrated 'fell 36.3 points', its sign carried by words, not
+    digits — which is a qualitative claim the verifier doesn't police anyway."""
     tol = 0.5 * (10 ** (-_decimals(p_tok))) + 1e-9
-    best = None
+    best, best_d = None, None
     for v in tool_vals:
-        if abs(p_val - v) <= tol and (best is None or abs(p_val - v) < abs(p_val - best)):
-            best = v
+        d = min(abs(p_val - v), abs(p_val + v))    # p matches a tool value or its sign-flip
+        if d <= tol and (best_d is None or d < best_d):
+            best, best_d = v, d
     return best
 
 
 def verify(answer: str, facts: list[dict]) -> dict:
     """Classify every number in `answer` as tool-backed, structural, or unsupported."""
     tool_vals = _tool_values(facts)
+    # drop line-leading list markers ('1)', '2.', '10) ') so a numbered list's ordinals aren't
+    # read as claims. Requires whitespace after the marker, so decimals ('36.3') are untouched.
+    text = re.sub(r"(?m)^\s*\d+[.)]\s", " ", answer or "")
     tool_supported, structural, unsupported = [], [], []
-    for tok in _NUM.findall(answer or ""):
+    for tok in _NUM.findall(text):
         val = _to_float(tok)
         backed = _backed_by(val, tok, tool_vals)
         if backed is not None:
