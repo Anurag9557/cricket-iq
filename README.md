@@ -11,6 +11,10 @@
 </p>
 
 <p align="center">
+  <a href="https://anurag9557.github.io/cricket-iq/"><img src="https://img.shields.io/badge/▶%20Live%20Demo-Play%20it%20in%20your%20browser-2f7d32?style=for-the-badge" alt="Live Demo — CricketIQ replay"></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white" alt="Python 3.14">
   <img src="https://img.shields.io/badge/FastAPI-SSE-009688?logo=fastapi&logoColor=white" alt="FastAPI">
   <img src="https://img.shields.io/badge/Model-LightGBM-2f7d32" alt="LightGBM">
@@ -20,7 +24,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/ui-main.png" width="95%" alt="CricketIQ — RCB vs KKR replay, one-run finish">
+  <a href="https://anurag9557.github.io/cricket-iq/"><img src="assets/ui-main.png" width="95%" alt="CricketIQ — RCB vs KKR replay, one-run finish"></a>
 </p>
 <!-- Upgrade later: swap ui-main.png above for an animated assets/replay.gif of a full replay -->
 
@@ -92,8 +96,7 @@ What makes it different from a score viewer:
 
 ## Demo
 
-<!-- TODO: Deployment URL — hosted replay UI (e.g. HF Spaces / Render free tier) -->
-**Live demo:** `TODO: deployment URL`
+**Live demo:** **<https://anurag9557.github.io/cricket-iq/>** — a precomputed, server-free replay that runs entirely in your browser on GitHub Pages (no backend to wake, nothing to fail live). Pick a match, press **Play** (or **Skip to end**), and click any key moment for the verified commentary and the model's SHAP drivers.
 
 The replay shown in the header is the 2024 RCB vs KKR match — a chase settled by a single run — with verified commentary cards firing on each key moment.
 
