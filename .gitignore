@@ -223,3 +223,6 @@ __marimo__/
 *.parquet
 .env
 audit_runs/
+
+
+*.bak
