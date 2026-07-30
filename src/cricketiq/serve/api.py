@@ -96,6 +96,11 @@ def winprob_ball(match_id: str, ball_seq: int):
         raise HTTPException(404, f"no state for match {match_id} ball {ball_seq}")
     return result
 
+@app.get("/match/{match_id}/commentary")
+def match_commentary(match_id: str):
+    """Precomputed verified key-moment commentary cards for a match (read-only)."""
+    return {"match_id": match_id, "cards": data.get_commentary(match_id)}
+
 
 @app.post("/winprob")
 def winprob_state(state: MatchState):

@@ -94,6 +94,9 @@
   .dbar{display:block;height:100%;border-radius:3px}
   .dbar.up{background:var(--good)}
   .dbar.dn{background:var(--critical)}
+  .badge{font-size:10px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:99px;margin-right:6px;vertical-align:middle;white-space:nowrap}
+  .badge.ok{color:var(--good-text);border:1px solid var(--good)}
+  .badge.fallback{color:var(--ink-mut);border:1px solid var(--border)}
 </style>
 </head>
 <body class="viz-root">
@@ -144,7 +147,7 @@
     <div class="card">
       <h3>Key moments · model read</h3>
       <div class="cmt-col" id="moments"></div>
-      <div class="hint"><b>Click any moment</b> to see the model's drivers (TreeSHAP, via <code>/winprob</code>). Flagged when win probability swings &ge;8 points on a single ball. The <b>verified AI commentary</b> (LangGraph agent, every stat re-checked against the data) arrives in Phase&nbsp;5.</div>
+      <div class="hint"><b>Click any moment</b> to see the model's drivers (TreeSHAP, via <code>/winprob</code>) and the verified facts behind the line. Flagged when win probability swings &ge;8 points on a single ball. The <b>&#10003; Verified AI commentary</b> is written by the agent and re-checked number-by-number against the data; if a line can't be verified, a grounded template is shown instead.</div>
     </div>
   </div>
 
@@ -227,6 +230,7 @@ svg.addEventListener("mouseleave", ()=> tip.style.opacity = 0);
 
 // ================= replay state =================
 let meta = null, es = null, playing = false;
+let cmtMap = {}, cmtMatch = null;     // ball_seq -> precomputed verified commentary card
 const overOf = disp => { const [o,b] = String(disp).split("."); return (+o) + (+b)/6; };
 
 function describe(b){
@@ -253,6 +257,18 @@ function applyMeta(m){
   $("chartTitle").textContent = `Win probability — ${m.team_chase} chasing ${m.target} (B1 · LightGBM)`;
 }
 
+// pull the precomputed verified commentary for this match once, before the balls stream in.
+// Absent file / unbuilt match -> empty map, and every card silently uses the templated line.
+async function loadCommentary(id){
+  if(cmtMatch === id) return;
+  cmtMap = {}; cmtMatch = id;
+  try{
+    const res = await fetch(`${API}/match/${id}/commentary`);
+    const data = await res.json();
+    (data.cards || []).forEach(c => { cmtMap[c.ball_seq] = c; });
+  }catch(err){ /* no commentary endpoint/data -> templated fallback */ }
+}
+
 function step(b){
   const wp = Math.round(b.win_prob*100), dwp = 100-wp, d = Math.round(b.wp_delta*100);
   $("score").textContent = b.score + "/" + b.wickets;
@@ -277,11 +293,19 @@ function step(b){
     marker(overOf(b.display_ball), wp, b.wicket_fell?"W":(b.runs_this_ball===6?"6":(d>0?"▲":"▼")), b.wp_delta<0);
     const c = document.createElement("div");
     c.className = "cmt clickable " + (b.wicket_fell?"wkt":(d>0?"six":""));
+    const card = cmtMap[b.ball_seq];                 // verified commentary for this ball, if precomputed
     const note = b.runs_needed>0
       ? `${b.runs_needed} needed off ${b.balls_remaining}, required rate ${b.required_rr.toFixed(1)}.`
       : `Scores settled.`;
-    c.innerHTML = `<div class="when">${b.display_ball} ov · ${describe(b)} · win prob ${d>0?"+":""}${d} pts <span class="whycue">why &#9656;</span></div>`+
-                  `<p>${meta.team_chase} ${d>0?"up":"down"} to <b>${wp}%</b>. ${note}</p>`;
+    const body = card
+      ? `<p>${card.commentary}</p>`
+      : `<p>${meta.team_chase} ${d>0?"up":"down"} to <b>${wp}%</b>. ${note}</p>`;
+    const badge = card
+      ? `<span class="badge ${card.status==='verified'?'ok':'fallback'}">${card.status==='verified'?'\u2713 Verified':'\u2713 Safe fallback'}</span>`
+      : "";
+    c.innerHTML = `<div class="when">${b.display_ball} ov · ${describe(b)} · win prob ${d>0?"+":""}${d} pts ${badge}<span class="whycue">why &#9656;</span></div>`+
+                  body;
+    if(card) c.dataset.card = JSON.stringify(card);   // stash facts for the evidence panel
     const mid = meta.match_id, bseq = b.ball_seq;
     c.addEventListener("click", () => showWhy(c, mid, bseq));
     $("moments").prepend(c);
@@ -318,7 +342,18 @@ async function showWhy(card, matchId, ballSeq){
              `<span class="dcontrib ${d.direction==='up'?'up':'dn'}">${sc}</span>`+
              `<span class="dtrack"><span class="dbar ${d.direction==='up'?'up':'dn'}" style="width:${pct}%"></span></span></div>`;
     }).join("");
-    why.innerHTML = `<div class="whead">SHAP contribution (log-odds) · <span style="color:var(--good-text)">green</span> pushes ${meta.team_chase} up, <span style="color:var(--critical)">red</span> down</div>${rows}`;
+    let facts = "";
+    if(card.dataset.card){
+      const f = JSON.parse(card.dataset.card);
+      const badge = f.status==='verified' ? 'Verified' : 'Safe fallback';
+      const swing = `${f.wp_delta_pts>0?'+':''}${Math.round(f.wp_delta_pts)} pts`;
+      const chase = (f.runs_needed>0) ? ` · ${f.runs_needed} needed off ${f.balls_remaining}` : "";
+      const why2  = f.reason ? ` · ${f.reason}` : "";
+      facts = `<div class="whead" style="color:var(--good-text)">\u2713 ${badge} — every number in the line traces to the data</div>`+
+              `<div class="drow" style="grid-template-columns:1fr"><span class="dlabel" style="white-space:normal">`+
+              `win prob ${Math.round(f.win_prob_pct)}% · swing ${swing}${chase}${why2}</span></div>`;
+    }
+    why.innerHTML = facts + `<div class="whead">SHAP contribution (log-odds) · <span style="color:var(--good-text)">green</span> pushes ${meta.team_chase} up, <span style="color:var(--critical)">red</span> down</div>${rows}`;
   }catch(err){
     why.innerHTML = `<div class="whead">could not load drivers</div>`;
   }
@@ -327,10 +362,11 @@ async function showWhy(card, matchId, ballSeq){
 // ================= transport =================
 function closeStream(){ if(es){ es.close(); es = null; } }
 
-function play(){
+async function play(){
   if(playing) return;
   const id = $("matchSel").value; if(!id) return;
   closeStream(); resetUI();
+  await loadCommentary(id);                 // ensure cards are ready before the first ball
   playing = true;
   $("play").disabled = true;
   $("statusPill").className = "pill live"; $("statusPill").textContent = "● LIVE";
@@ -349,6 +385,7 @@ function play(){
 async function skipToEnd(id){
   closeStream();
   id = id || $("matchSel").value;
+  await loadCommentary(id);
   try{
     const res = await fetch(`${API}/match/${id}/timeline`);
     const data = await res.json();
@@ -362,9 +399,10 @@ async function skipToEnd(id){
 }
 
 // ================= boot =================
+const DEMO_MATCH = "1426274";   // KKR v RCB 2024 — 1-run thriller, full of verified cards
 async function boot(){
   try{
-    const res = await fetch(`${API}/matches?limit=400`);
+    const res = await fetch(`${API}/matches?limit=2000`);
     const list = await res.json();
     const sel = $("matchSel");
     list.forEach(m=>{
@@ -373,16 +411,22 @@ async function boot(){
       o.textContent = `${m.team_chase} v ${m.team_bat_first} · ${m.date} · ${m.city||m.venue||""}`;
       sel.appendChild(o);
     });
-    // default to the last-ball thriller if it's in the pool, else newest
-    const thriller = [...sel.options].find(o=>o.value==="981005");
-    if(thriller) thriller.selected = true;
+    // land on the demo match — add it if it fell outside the fetched list, then select it
+    let pick = [...sel.options].find(o=>o.value===DEMO_MATCH);
+    if(!pick){
+      pick = document.createElement("option");
+      pick.value = DEMO_MATCH;
+      pick.textContent = "Royal Challengers Bengaluru v Kolkata Knight Riders · 2024-04-21 · Kolkata";
+      sel.insertBefore(pick, sel.firstChild);
+    }
+    pick.selected = true;
   }catch(err){
     $("matchSel").innerHTML = `<option>API not reachable — is uvicorn running?</option>`;
   }
 }
 $("play").addEventListener("click", play);
 $("skip").addEventListener("click", ()=>{ $("statusPill").className="pill live"; $("statusPill").textContent="● LIVE"; skipToEnd(); });
-$("matchSel").addEventListener("change", ()=>{ closeStream(); playing=false; resetUI();
+$("matchSel").addEventListener("change", ()=>{ closeStream(); playing=false; cmtMatch=null; resetUI();
   $("statusPill").className="pill"; $("statusPill").textContent="● READY"; $("play").innerHTML="&#9654; Play"; $("play").disabled=false; });
 drawAxes();   // show empty axes on load, before the first Play
 boot();

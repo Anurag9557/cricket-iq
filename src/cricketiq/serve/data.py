@@ -65,6 +65,26 @@ def get_meta(match_id: str) -> dict | None:
     row = _mt().filter(pl.col("match_id") == match_id)
     return row.to_dicts()[0] if row.height else None
 
+# ---- precomputed verified commentary (Phase 6.1) -------------------------------
+_COMMENTARY: dict[str, list[dict]] | None = None
+
+def _load_commentary() -> dict[str, list[dict]]:
+    global _COMMENTARY
+    if _COMMENTARY is None:
+        path = config.PROCESSED_DIR / "commentary.parquet"
+        by_match: dict[str, list[dict]] = {}
+        if path.exists():
+            for row in pl.read_parquet(path).iter_rows(named=True):
+                by_match.setdefault(str(row["match_id"]), []).append(row)
+            for cards in by_match.values():
+                cards.sort(key=lambda c: c["ball_seq"])
+        _COMMENTARY = by_match
+    return _COMMENTARY
+
+def get_commentary(match_id: str) -> list[dict]:
+    """Precomputed verified key-moment cards for one match, sorted by ball_seq."""
+    return _load_commentary().get(str(match_id), [])
+
 
 def get_timeline(match_id: str) -> list[dict]:
     """Every delivery of one match, in order, with a cricket-style over.ball label
