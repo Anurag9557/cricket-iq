@@ -76,7 +76,7 @@ def main() -> None:
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     fig.tight_layout()
-    out = ROOT / "docs" / "reliability.png"
+    out = ROOT / "documentation" / "reliability.png"
     fig.savefig(out, dpi=130)
     print(f"\n  saved {out}")
 

@@ -26,7 +26,6 @@
 <p align="center">
   <a href="https://anurag9557.github.io/cricket-iq/"><img src="assets/replay.gif" width="95%" alt="CricketIQ — RCB vs KKR replay, one-run finish"></a>
 </p>
-<!-- Upgrade later: swap ui-main.png above for an animated assets/replay.gif of a full replay -->
 
 ---
 
@@ -268,8 +267,8 @@ src/cricketiq/
 ├── serve/    FastAPI · data access · TreeSHAP · timeline & commentary builders · replay UI
 ├── agent/    stat tools · verifier · repair · LangGraph · audits
 └── core/     shared configuration
-tests/        parser · state · eval · tools · verifier
-docs/         results · leakage audit · serving · verified-agent notes
+tests/          parser · state · eval · tools · verifier
+documentation/  results · leakage audit · serving · verified-agent notes
 ```
 
 `src/cricketiq/data/` — ingestion and preparation. The download, parse, and state-building scripts that turn Cricsheet JSON into the columnar tables everything else reads. This is where the leak-free feature definitions live.
@@ -286,7 +285,7 @@ docs/         results · leakage audit · serving · verified-agent notes
 
 `tests/` — parser invariants, state-builder cross-checks, evaluation-harness sanity checks, stat-tool golden values, and verifier tests.
 
-`docs/` — the results write-up (the model ladder and all metrics), the leakage audit, the serving notes, and the verified-agent write-up.
+`documentation/` — the results write-up (the model ladder and all metrics), the leakage audit, the serving notes, and the verified-agent write-up.
 
 ---
 
@@ -421,16 +420,14 @@ Verification is the component that lets the rest of the system use a language mo
 
 The architecture's performance story is mostly about what is *not* on the request path. Win probabilities and commentary are precomputed; serving them is a file read and an in-memory lookup. The only on-demand computation is a single-row TreeSHAP call when a user clicks "why."
 
-| Aspect | Characteristic | Measured value |
-|---|---|---|
-| Win-probability serving | Precomputed; no live model inference | Read from `timelines.parquet` — TODO |
-| Commentary lookup | In-memory map keyed by delivery sequence, O(1) per ball | TODO |
-| "Why" attribution | Single-row native TreeSHAP, on demand | TODO |
-| Replay cadence | One ball per tick, 0.5×–4× speeds | Configurable |
-| `state.parquet` | Per-ball chase state | 782,542 rows — on-disk size TODO |
-| `commentary.parquet` (demo set) | Verified cards, 9 matches | 90 cards — on-disk size TODO |
-
-<!-- TODO: fill measured latencies (p50/p95) and on-disk sizes once benchmarked -->
+| Aspect | Characteristic |
+|---|---|
+| Win-probability serving | Precomputed; no live model inference — read from `timelines.parquet` |
+| Commentary lookup | In-memory map keyed by delivery sequence, O(1) per ball |
+| "Why" attribution | Single-row native TreeSHAP, computed on demand |
+| Replay cadence | One ball per tick, 0.5×–4× speeds (configurable) |
+| `state.parquet` | Per-ball chase state — 782,542 rows |
+| `commentary.parquet` (demo set) | Verified cards — 90 across 9 matches |
 
 ---
 
