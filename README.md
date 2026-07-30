@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://anurag9557.github.io/cricket-iq/"><img src="assets/ui-main.png" width="95%" alt="CricketIQ — RCB vs KKR replay, one-run finish"></a>
+  <a href="https://anurag9557.github.io/cricket-iq/"><img src="assets/replay.gif" width="95%" alt="CricketIQ Demo Replay"></a>
 </p>
 <!-- Upgrade later: swap ui-main.png above for an animated assets/replay.gif of a full replay -->
 
