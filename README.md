@@ -20,9 +20,9 @@
 </p>
 
 <p align="center">
-  <!-- TODO: record the RCB vs KKR 2024 one-run finish and commit it to assets/replay.gif -->
-  <img src="assets/replay.gif" width="95%" alt="CricketIQ replay — RCB vs KKR, one-run finish">
+  <img src="assets/ui-main.png" width="95%" alt="CricketIQ — RCB vs KKR replay, one-run finish">
 </p>
+<!-- Upgrade later: swap ui-main.png above for an animated assets/replay.gif of a full replay -->
 
 ---
 
