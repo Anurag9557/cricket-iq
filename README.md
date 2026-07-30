@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <a href="https://anurag9557.github.io/cricket-iq/"><img src="assets/replay.gif" width="95%" alt="CricketIQ Demo Replay"></a>
+  <a href="https://anurag9557.github.io/cricket-iq/"><img src="assets/replay.gif" width="95%" alt="CricketIQ — RCB vs KKR replay, one-run finish"></a>
 </p>
 <!-- Upgrade later: swap ui-main.png above for an animated assets/replay.gif of a full replay -->
 
@@ -590,15 +590,13 @@ All responses are JSON except the streaming endpoint. Match IDs are strings.
 
 ## Screenshots
 
-<!-- TODO: capture into assets/ and replace the placeholders below -->
-
 | Main replay | Win-probability graph |
 | :--: | :--: |
-| _TODO — `assets/ui-main.png`_ | _TODO — `assets/ui-winprob.png`_ |
+| ![Main replay — win-probability curve, scoreboard and ball feed](assets/ui-main.png) | ![Win-probability graph building ball by ball](assets/ui-winprob.png) |
 
 | Commentary card + evidence panel | Ball feed / timeline |
 | :--: | :--: |
-| _TODO — `assets/ui-card.png`_ | _TODO — `assets/ui-feed.png`_ |
+| ![Verified commentary card with the SHAP evidence panel open](assets/ui-card.png) | ![Ball-by-ball feed with win-probability deltas](assets/ui-feed.png) |
 
 ---
 
