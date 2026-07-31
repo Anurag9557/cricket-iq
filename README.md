@@ -12,6 +12,7 @@
 
 <p align="center">
   <a href="https://anurag9557.github.io/cricket-iq/"><img src="https://img.shields.io/badge/▶%20Live%20Demo-Play%20it%20in%20your%20browser-2f7d32?style=for-the-badge" alt="Live Demo — CricketIQ replay"></a>
+  <a href="https://drive.google.com/file/d/1tkpoCvl6RSYmGW4jW2fXtrhOq2COaosV/view"><img src="https://img.shields.io/badge/🎥%20Demo%20Video-60s%20narrated%20walkthrough-b31b1b?style=for-the-badge" alt="Demo video — 60-second narrated walkthrough"></a>
 </p>
 
 <p align="center">
@@ -96,6 +97,8 @@ What makes it different from a score viewer:
 ## Demo
 
 **Live demo:** **<https://anurag9557.github.io/cricket-iq/>** — a precomputed, server-free replay that runs entirely in your browser on GitHub Pages (no backend to wake, nothing to fail live). Pick a match, press **Play** (or **Skip to end**), and click any key moment for the verified commentary and the model's SHAP drivers.
+
+**Video walkthrough:** a ~1-minute narrated tour of the replay, the verified commentary, and the explainability panel — **[watch on Google Drive](https://drive.google.com/file/d/1tkpoCvl6RSYmGW4jW2fXtrhOq2COaosV/view)**.
 
 The replay shown in the header is the 2024 RCB vs KKR match — a chase settled by a single run — with verified commentary cards firing on each key moment.
 
