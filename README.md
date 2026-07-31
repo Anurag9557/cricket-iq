@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://anurag9557.github.io/cricket-iq/"><img src="https://img.shields.io/badge/▶%20Live%20Demo-Play%20it%20in%20your%20browser-2f7d32?style=for-the-badge" alt="Live Demo — CricketIQ replay"></a>
-  <a href="https://drive.google.com/file/d/1tkpoCvl6RSYmGW4jW2fXtrhOq2COaosV/view"><img src="https://img.shields.io/badge/🎥%20Demo%20Video-60s%20narrated%20walkthrough-b31b1b?style=for-the-badge" alt="Demo video — narrated walkthrough"></a>
+  <a href="https://drive.google.com/file/d/1tkpoCvl6RSYmGW4jW2fXtrhOq2COaosV/view"><img src="https://img.shields.io/badge/🎥%20Demo%20Video%20narrated%20walkthrough-b31b1b?style=for-the-badge" alt="Demo video — narrated walkthrough"></a>
 </p>
 
 <p align="center">
