@@ -505,8 +505,6 @@ python -m cricketiq.agent.offon            # verification OFF vs ON headline
 pytest                                     # parser, state, eval, tools, verifier
 ```
 
-> Module names above follow the `src/cricketiq/` layout; if any local script differs, adjust the command accordingly.
-
 ---
 
 ## Building commentary
